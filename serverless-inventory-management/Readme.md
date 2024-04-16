@@ -1,4 +1,4 @@
-# Serverless Inventory Management.
+# Serverless Inventory Management
 
 ## Goals
 
