@@ -9,29 +9,4 @@ resource "aws_dynamodb_table" "inventory_files" {
     name = "ItemId"
     type = "S"
   }
-
-  attribute {
-    name = "Timestamp"
-    type = "S"
-  }
-
-  attribute {
-    name = "WarehouseName"
-    type = "S"
-  }
-
-  attribute {
-    name = "ItemName"
-    type = "S"
-  }
-
-  attribute {
-    name = "StockLevelChange"
-    type = "N"
-  }
-
-  tags = {
-    Name        = "Demo DynamoDB Table"
-    Environment = "Testing"
-  }
 }
