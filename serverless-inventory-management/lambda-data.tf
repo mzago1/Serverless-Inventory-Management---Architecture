@@ -1,9 +1,9 @@
 resource "aws_lambda_function" "insert_data_lambda" {
-  filename         = "insert-data.zip" // O arquivo ZIP contendo o código da função Lambda
+  filename         = "lambda-data.zip" // O arquivo ZIP contendo o código da função Lambda
   function_name    = "InsertDataLambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("insert-data.zip")
+  source_code_hash = filebase64sha256("lambda-data.zip")
   runtime          = "python3.8"
   
   environment {
