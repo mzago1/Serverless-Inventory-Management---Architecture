@@ -1,16 +1,24 @@
-resource "aws_lambda_function" "insert_data_lambda" {
-  filename         = "lambda-data.zip" // O arquivo ZIP contendo o código da função Lambda
+resource "aws_lambda_function" "lambda-data" {
+  filename         = "lambda-data.zip" // Lambda file
   function_name    = "InsertDataLambda"
   role             = aws_iam_role.lambda_role.arn
-  handler          = "index.handler"
+  handler          = "lambda-data.handler"
   source_code_hash = filebase64sha256("lambda-data.zip")
   runtime          = "python3.8"
+  timeout          = 10  # Aumente o tempo limite para 10 segundos ou mais, conforme necessário
   
   environment {
     variables = {
       DYNAMODB_TABLE_NAME = aws_dynamodb_table.inventory_table.name
     }
   }
+}
+
+resource "aws_lambda_permission" "allow_invoke" {
+  statement_id  = "AllowInvokeFromLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda-data.function_name
+  principal     = "lambda.amazonaws.com"
 }
 
 resource "aws_iam_role" "lambda_role" {
