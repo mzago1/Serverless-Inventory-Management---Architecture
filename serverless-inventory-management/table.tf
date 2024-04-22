@@ -1,18 +1,3 @@
-resource "aws_dynamodb_table" "inventory_files" {
-  name           = "inventory_fils"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 5
-  write_capacity = 5
-  hash_key       = "ItemId"
-
-  attribute {
-    name = "ItemId"
-    type = "S"
-  }
-provider "aws" {
-  region = "eu-central-1"
-}
-
 resource "aws_dynamodb_table" "inventory_table" {
   name           = "Inventory"
   billing_mode   = "PAY_PER_REQUEST"
@@ -41,5 +26,29 @@ resource "aws_dynamodb_table" "inventory_table" {
   attribute {
     name = "StockLevelChange"
     type = "N"
+  }
+  
+  global_secondary_index {
+    name               = "StockLevelChangeIndex"
+    hash_key           = "StockLevelChange"
+    projection_type    = "ALL"
+  }
+  
+  global_secondary_index {
+    name               = "ItemNameIndex"
+    hash_key           = "ItemName"
+    projection_type    = "ALL"
+  }
+  
+  global_secondary_index {
+    name               = "WarehouseNameIndex"
+    hash_key           = "WarehouseName"
+    projection_type    = "ALL"
+  }
+  
+  global_secondary_index {
+    name               = "TimestampIndex"
+    hash_key           = "Timestamp"
+    projection_type    = "ALL"
   }
 }
