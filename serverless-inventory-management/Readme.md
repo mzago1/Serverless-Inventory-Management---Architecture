@@ -103,19 +103,19 @@ Check out the parameters in the documentation, you can use them to create more d
 
 It's not the goal to come up with a perfect solution in the beginning, but having a good idea of what you're trying to implement helps with the next steps.
 
-1. Read and think about the scenario **and all tasks**, make a list of all requirements
-1. Design an architecture diagram for this use case and explain it to a colleague
-1. Design a data model that's fit for the use case and also explain that to a colleague
-1. Iterate over the design until you have a good mental model how the data flows are supposed to look like
-1. Select an infrastructure as code framework, the choice may depend on your preferences or what your colleagues use
+1. [x] Read and think about the scenario **and all tasks**, make a list of all requirements
+1. [x] Design an architecture diagram for this use case and explain it to a colleague
+1. [x] Design a data model that's fit for the use case and also explain that to a colleague
+1. [x] Iterate over the design until you have a good mental model how the data flows are supposed to look like
+1. [x] Select an infrastructure as code framework, the choice may depend on your preferences or what your colleagues use
     - If you're familiar with object oriented programming in Python, TypeScript, .Net, Java or JavaScript I strongly recommend the Cloud Development Kit
     - If your background is more related to a traditional sysops role, you might prefer declarative solutions such as Terraform, the Serverless Framework, SAM or pure CloudFormation
 
 ### Task 02: Implement data ingestion for the inventory files
 
-1. Create the infrastructure to store the inventory files
-1. Implement a mechanism to respond to new inventory files, parse them and update the stock levels
-1. Test this with some of the sample data you created earlier
+1. [x] Create the infrastructure to store the inventory files
+1. [ ] Implement a mechanism to respond to new inventory files, parse them and update the stock levels
+1. [x] Test this with some of the sample data you created earlier
 
 ### Task 03: Implement data ingestion for the restock thresholds
 
