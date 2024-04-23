@@ -119,15 +119,15 @@ It's not the goal to come up with a perfect solution in the beginning, but havin
 
 ### Task 03: Implement data ingestion for the restock thresholds
 
-1. Create the infrastructure to store the restock thresholds, ideally it's the same bucket as in Task 02
-1. Implement a mechanism to respond to new files, parse them and update the restock levels
-1. Test this with some of the sample data
+1. [ ] Create the infrastructure to store the restock thresholds, ideally it's the same bucket as in Task 02
+1. [ ] Implement a mechanism to respond to new files, parse them and update the restock levels
+1. [ ] Test this with some of the sample data
 
 ### Task 04: Implement alerting logic based on the restock thresholds
 
-Whenever updates to the stock levels happen, it should be checked if they're below the restock level for that item.
+[ ] Whenever updates to the stock levels happen, it should be checked if they're below the restock level for that item.
 If no restock level exists for this item, it should be assumed to be **10**.
-Should that item be below the restock level, send a notification to the purchasing department (your e-mail inbox) to request new items.
+[ ] Should that item be below the restock level, send a notification to the purchasing department (your e-mail inbox) to request new items.
 
 ### Task 05: Implement reporting requirements
 
@@ -135,9 +135,9 @@ As mentioned in the scenario, management has a few requirements in terms of repo
 
 They want to:
 
-- Get a list of all items in warehouse `x`
-- Get a list of all items in warehouse `x` with a current inventory that's greater than `y`
-- Get the total inventory for item with id `x` across all warehouses
+- [x] Get a list of all items in warehouse `x`
+- [ ] Get a list of all items in warehouse `x` with a current inventory that's greater than `y`
+- [ ] Get the total inventory for item with id `x` across all warehouses
 
 Implement code to fulfill these requirements.
 
@@ -151,9 +151,9 @@ Since these checks typically take between 40-50 minutes, a solution that's a lon
 
 **Check logic:**
 
-- For each file since the last check
-  - Download the file and parse it
-  - For each transaction in the file `check_transaction`
+- [ ] For each file since the last check
+  - [ ] Download the file and parse it
+  - [ ] For each transaction in the file `check_transaction`
 
     ```python
     def check_transaction(*args, **kwargs):
@@ -162,20 +162,20 @@ Since these checks typically take between 40-50 minutes, a solution that's a lon
         time.sleep(10) # "Process" for 10 seconds. You may lower this for debugging.
     ```
 
-- Send an E-Mail notification, that the validation has been completed
+- [ ] Send an E-Mail notification, that the validation has been completed
 
 Implement a solution that fulfills these requirements.
 
 ### Task 07 (optional): Refactor data model to adhere to a single table design
 
-_This is an advanced task if you want to dive deeper in DynamoDB which I highly recommend._
+[ ] _This is an advanced task if you want to dive deeper in DynamoDB which I highly recommend._
 
 You've presumably created multiple tables in DynamoDB to implement your architecture.
 This can be optimized, check out the re:invent talks by Rick Houlihan (DynamoDB 400 level talks) - yes, all of them, they're amazing - and after you've watched them, reconsider and redesign your table(s).
 
 ### Task 08 (optional): Apply new restock thresholds to existing items
 
-_This is a task that may be suitable to learn how to **step** up your **function** game._
+[ ] _This is a task that may be suitable to learn how to **step** up your **function** game._
 
 The scenario asks you to apply new restock thresholds after they have been send to the system.
 The most straightforward implementations will have the problem, that these changes to the threshold are only taken into account, whenever there is a transaction that changes the stock level.
@@ -187,18 +187,17 @@ The most straightforward implementations will have the problem, that these chang
 1. Now `x` would need to be restocked
 1. If you only evaluate if restocks need to happen whenever the stock level of `x` changes, this won't be discovered until the stock level changes
 
-Implement a way to check current inventory levels against the new restock thresholds.
+[ ] Implement a way to check current inventory levels against the new restock thresholds.
 
 ### Task 09 (optional): A wild data scientist appears
 
-You've just got a new addition to the team - a data scientist!
+[ ] You've just got a new addition to the team - a data scientist!
 This data scientist would like to do exploratory analyses on the raw data using SQL.
 
-Can you help him out and set up serverless infrastructure for them to query the data?
+[ ] Can you help him out and set up serverless infrastructure for them to query the data?
 
 ### Task 10 (optional): Dance like nobody is watching, encrypt like everybody is
 
-It's good practice to encrypt data at rest and in transit.
-The in transit part is typically handled through the AWS SDK automatically.
-Encryption at rest depends on the service and usually works in combination with AWS KMS.
+[ ] It's good practice to encrypt data at rest and in transit.
+The in transit part is typically handled through the AWS SDK automatically. Encryption at rest depends on the service and usually works in combination with AWS KMS.
 
