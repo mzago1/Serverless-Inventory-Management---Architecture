@@ -3,7 +3,7 @@ import csv
 from datetime import datetime
 
 # Configurations
-s3_bucket_name = 'inventory-bucket-example'
+s3_bucket_name = 'unique-name-for-inventory-bucket-example'
 s3_prefix = 'inventory_files'
 ddb_table_name = 'Inventory'
 

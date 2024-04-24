@@ -52,3 +52,30 @@ resource "aws_dynamodb_table" "inventory_table" {
     projection_type    = "ALL"
   }
 }
+
+resource "aws_dynamodb_table" "restock_table" {
+  name           = "Restock"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "ItemId"
+
+  attribute {
+    name = "ItemId"
+    type = "S"
+  }
+
+  attribute {
+    name = "RestockIfBelow"
+    type = "N"
+  }
+
+  tags = {
+    Name = "Restock Table"
+  }
+
+  global_secondary_index {
+    name               = "RestockIfBelowIndex"
+    hash_key           = "RestockIfBelow"
+    projection_type    = "ALL"
+  }
+}
+
