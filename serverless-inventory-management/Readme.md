@@ -119,7 +119,7 @@ It's not the goal to come up with a perfect solution in the beginning, but havin
 
 ### Task 03: Implement data ingestion for the restock thresholds
 
-1. [ ] Create the infrastructure to store the restock thresholds, ideally it's the same bucket as in Task 02
+1. [x] Create the infrastructure to store the restock thresholds, ideally it's the same bucket as in Task 02
 1. [ ] Implement a mechanism to respond to new files, parse them and update the restock levels
 1. [ ] Test this with some of the sample data
 
