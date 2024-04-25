@@ -116,7 +116,7 @@ def write_batch(batch_of_transactions: typing.List[list]):
     pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
 
     with open(file_path + file_name, mode="w", newline="") as inventory_file:
-        writer = csv.writer(inventory_file, delimiter="\t")
+        writer = csv.writer(inventory_file, delimiter=";")
 
         writer.writerow(["Timestamp", "WarehouseName", "ItemId", "ItemName", "StockLevelChange"])
 
