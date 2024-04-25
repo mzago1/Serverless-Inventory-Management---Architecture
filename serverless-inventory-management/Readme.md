@@ -120,8 +120,8 @@ It's not the goal to come up with a perfect solution in the beginning, but havin
 ### Task 03: Implement data ingestion for the restock thresholds
 
 1. [x] Create the infrastructure to store the restock thresholds, ideally it's the same bucket as in Task 02
-1. [ ] Implement a mechanism to respond to new files, parse them and update the restock levels
-1. [ ] Test this with some of the sample data
+1. [x] Implement a mechanism to respond to new files, parse them and update the restock levels
+1. [x] Test this with some of the sample data
 
 ### Task 04: Implement alerting logic based on the restock thresholds
 
@@ -137,7 +137,7 @@ They want to:
 
 - [x] Get a list of all items in warehouse `x`
 - [x] Get a list of all items in warehouse `x` with a current inventory that's greater than `y`
-- [ ] Get the total inventory for item with id `x` across all warehouses
+- [x] Get the total inventory for item with id `x` across all warehouses
 
 Implement code to fulfill these requirements.
 
