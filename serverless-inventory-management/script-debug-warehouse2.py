@@ -1,6 +1,6 @@
 import boto3
 import csv
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Configurations
 s3_bucket_name = 'unique-name-for-inventory-bucket-example'
@@ -36,7 +36,7 @@ def import_inventory_data():
             for row in reader:
                 try:
                     # Format the timestamp for DynamoDB
-                    timestamp = datetime.strptime(row['Timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
+                    timestamp = datetime.strptime(row['Timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z').astimezone(timezone.utc)
                     
                     # Check if the ItemName is not empty
                     if row['ItemName']:  
@@ -45,7 +45,7 @@ def import_inventory_data():
                         
                         # Check if the item in this warehouse already exists in the latest_stock_changes dictionary
                         if item_warehouse_key in latest_stock_changes:
-                            # If the item exists, check if this occurrence has a more recent timestamp
+                            # If the item exists and the timestamp is more recent, update the stock level change
                             if timestamp > latest_stock_changes[item_warehouse_key]['Timestamp']:
                                 latest_stock_changes[item_warehouse_key] = {
                                     'Timestamp': timestamp,
