@@ -114,7 +114,7 @@ It's not the goal to come up with a perfect solution in the beginning, but havin
 ### Task 02: Implement data ingestion for the inventory files
 
 1. [x] Create the infrastructure to store the inventory files
-1. [ ] Implement a mechanism to respond to new inventory files, parse them and update the stock levels
+1. [x] Implement a mechanism to respond to new inventory files, parse them and update the stock levels
 1. [x] Test this with some of the sample data you created earlier
 
 ### Task 03: Implement data ingestion for the restock thresholds
@@ -126,7 +126,7 @@ It's not the goal to come up with a perfect solution in the beginning, but havin
 ### Task 04: Implement alerting logic based on the restock thresholds
 
 [ ] Whenever updates to the stock levels happen, it should be checked if they're below the restock level for that item.
-If no restock level exists for this item, it should be assumed to be **10**.
+[ ] If no restock level exists for this item, it should be assumed to be **10**.
 [ ] Should that item be below the restock level, send a notification to the purchasing department (your e-mail inbox) to request new items.
 
 ### Task 05: Implement reporting requirements
@@ -136,7 +136,7 @@ As mentioned in the scenario, management has a few requirements in terms of repo
 They want to:
 
 - [x] Get a list of all items in warehouse `x`
-- [ ] Get a list of all items in warehouse `x` with a current inventory that's greater than `y`
+- [x] Get a list of all items in warehouse `x` with a current inventory that's greater than `y`
 - [ ] Get the total inventory for item with id `x` across all warehouses
 
 Implement code to fulfill these requirements.
