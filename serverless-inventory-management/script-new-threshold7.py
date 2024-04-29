@@ -3,38 +3,38 @@ import csv
 import json
 from datetime import datetime, timezone
 
-# Configurações
+# Configurations
 s3_bucket_name = 'unique-name-for-inventory-bucket-example'
 s3_prefix_inventory = 'inventory_files'
 s3_prefix_thresholds = 'restock_thresholds'
 ddb_table_name = 'Inventory'
-restock_list_file = 'items_to_restock.txt'  # Arquivo para salvar a lista de itens para reposição
+restock_list_folder = 'restock_lists'  # Folder to save lists of items for restocking
 
-# Conexão com o S3 e DynamoDB
+# Connection to S3 and DynamoDB
 s3 = boto3.client('s3')
 ddb = boto3.resource('dynamodb')
 table = ddb.Table(ddb_table_name)
 
-# Função para buscar os limites de reposição do S3
+# Function to fetch restock thresholds from S3
 def fetch_restock_thresholds(timestamp):
     try:
-        # Extrair a data (ano, mês e dia) do timestamp do DynamoDB
+        # Extract the date (year, month, and day) from the DynamoDB timestamp
         year = timestamp.year
         month = timestamp.month
         day = timestamp.day
         
-        # Montar o prefixo do objeto no S3 com base na data do arquivo CSV processado
+        # Build the S3 object prefix based on the processed CSV file date
         prefix = f"{s3_prefix_thresholds}/{year}/{month:02d}/{day:02d}/"
         
-        # Listar objetos no S3 com base no prefixo
+        # List objects in S3 with the prefix
         response = s3.list_objects_v2(Bucket=s3_bucket_name, Prefix=prefix)
         
-        # Verificar se há objetos encontrados
+        # Check if objects are found
         if 'Contents' in response:
-            # Obter o último objeto da lista
+            # Get the last object from the list
             latest_file = max(response['Contents'], key=lambda x: x['LastModified'])
             
-            # Buscar o conteúdo do arquivo de limite de reposição
+            # Fetch the content of the restock threshold file
             thresholds_obj = s3.get_object(Bucket=s3_bucket_name, Key=latest_file['Key'])
             thresholds_data = thresholds_obj['Body'].read().decode('utf-8')
             
@@ -46,50 +46,50 @@ def fetch_restock_thresholds(timestamp):
         print(f"Failed to fetch restock thresholds: {e}")
         return None
 
-# Função para importar dados dos arquivos CSV no S3 para o DynamoDB
+# Function to import data from CSV files in S3 to DynamoDB
 def import_inventory_data():
     print("Starting data import...")
     
-    # Inicializar uma lista para armazenar os itens que precisam de reposição
+    # Initialize a list to store items that need restocking
     items_to_restock = []
     
-    # Listar objetos no bucket S3 para os arquivos de inventário
+    # List objects in the S3 bucket for inventory files
     response = s3.list_objects_v2(Bucket=s3_bucket_name, Prefix=s3_prefix_inventory)
     
-    # Loop através dos objetos
+    # Loop through the objects
     for obj in response.get('Contents', []):
-        # Verificar se o objeto é um arquivo CSV
+        # Check if the object is a CSV file
         if obj['Key'].endswith('.csv'):
-            # Extrair a data do arquivo CSV processado
+            # Extract the date of the processed CSV file
             timestamp_str = obj['LastModified'].strftime('%Y-%m-%d %H:%M:%S%z')
             
-            # Converter a string de data para um objeto datetime
+            # Convert the date string to a datetime object
             timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S%z')
             
-            # Ler o arquivo CSV do S3
+            # Read the CSV file from S3
             csv_obj = s3.get_object(Bucket=s3_bucket_name, Key=obj['Key'])
             lines = csv_obj['Body'].read().decode('utf-8').splitlines()
             
-            # Ler o CSV usando delimitador de ponto e vírgula
+            # Read the CSV using semicolon delimiter
             reader = csv.DictReader(lines, delimiter=';')
             
-            # Inicializar um dicionário para armazenar as últimas alterações no nível de estoque para cada item em cada armazém
+            # Initialize a dictionary to store the latest stock level changes for each item in each warehouse
             latest_stock_changes = {}
             
-            # Loop através das linhas do CSV para determinar a última alteração no nível de estoque para cada item em cada armazém
+            # Loop through the CSV rows to determine the latest stock level change for each item in each warehouse
             for row in reader:
                 try:
-                    # Formatar o timestamp para o DynamoDB
+                    # Format the timestamp for DynamoDB
                     timestamp = datetime.strptime(row['Timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z').astimezone(timezone.utc)
                     
-                    # Verificar se o ItemName não está vazio
+                    # Check if ItemName is not empty
                     if row['ItemName']:  
-                        # Gerar uma chave única para cada item em cada armazém
+                        # Generate a unique key for each item in each warehouse
                         item_warehouse_key = (row['ItemId'], row['WarehouseName'])
                         
-                        # Verificar se o item neste armazém já existe no dicionário latest_stock_changes
+                        # Check if the item in this warehouse already exists in the latest_stock_changes dictionary
                         if item_warehouse_key in latest_stock_changes:
-                            # Se o item existe e o timestamp é mais recente, atualizar a alteração no nível de estoque
+                            # If the item exists and the timestamp is more recent, update the stock level change
                             if timestamp > latest_stock_changes[item_warehouse_key]['Timestamp']:
                                 latest_stock_changes[item_warehouse_key] = {
                                     'Timestamp': timestamp,
@@ -98,7 +98,7 @@ def import_inventory_data():
                                     'WarehouseName': row['WarehouseName']  
                                 }
                         else:
-                            # Se o item não existe, adicioná-lo ao dicionário
+                            # If the item does not exist, add it to the dictionary
                             latest_stock_changes[item_warehouse_key] = {
                                 'Timestamp': timestamp,
                                 'StockLevelChange': int(row['StockLevelChange']),
@@ -113,29 +113,30 @@ def import_inventory_data():
                 except Exception as e:
                     print(f"Failed to process CSV row in file '{obj['Key']}': {e}")
             
-            # Chamar fetch_restock_thresholds para obter os limites de reposição
+            # Call fetch_restock_thresholds to get the restock thresholds
             thresholds_data = fetch_restock_thresholds(timestamp)
             if thresholds_data:
-                # Converter os dados de limites para dicionário
+                # Convert the thresholds data to a dictionary
                 thresholds = json.loads(thresholds_data)
                 
-                # Loop através dos itens em latest_stock_changes e verificar se é necessário repor o estoque
+                # Loop through the items in latest_stock_changes and check if restocking is necessary
                 for item_warehouse_key, data in latest_stock_changes.items():
                     try:
-                        # Verificar se o estoque do item está abaixo do limite de reposição
+                        # Check if the item stock is below the restock threshold
                         for threshold in thresholds.get('ThresholdList', []):
                             if threshold['ItemId'] == item_warehouse_key[0] and data['StockLevelChange'] < threshold.get('RestockIfBelow', 10):
                                 items_to_restock.append({
                                     'ItemID': item_warehouse_key[0],
+                                    'ItemName': data['ItemName'],
                                     'WarehouseName': item_warehouse_key[1],
                                     'CurrentStockLevel': data['StockLevelChange'],
                                     'RestockThreshold': threshold.get('RestockIfBelow', 10)
                                 })
-                                break  # Não é necessário verificar mais limites para este item
+                                break  # No need to check more thresholds for this item
                     except Exception as e:
                         print(f"Error while checking restock threshold for item '{item_warehouse_key[0]}': {e}")
             
-            # Loop através dos itens em latest_stock_changes e atualizar o DynamoDB com as últimas alterações no nível de estoque
+            # Loop through the items in latest_stock_changes and update DynamoDB with the latest stock level changes
             for item_warehouse_key, data in latest_stock_changes.items():
                 try:
                     existing_item = table.get_item(
@@ -153,7 +154,9 @@ def import_inventory_data():
                                 'ItemId': item_warehouse_key[0],
                                 'Timestamp': data['Timestamp'].strftime('%Y-%m-%dT%H:%M:%S'),
                                 'WarehouseName': data['WarehouseName'],
-                                'ItemName': data['ItemName'],
+                                'ItemName':
+
+ data['ItemName'],
                                 'StockLevelChange': new_stock_level
                             }
                         )
@@ -175,21 +178,36 @@ def import_inventory_data():
                     
             print(f"Data from file '{obj['Key']}' processed.")
     
-    # Escrever a lista de itens para reposição em um arquivo de texto
-    write_restock_list_to_file(items_to_restock)
+    # Write the list of items to restock to a text file
+    write_restock_list_to_s3(items_to_restock, timestamp)
     
     print("Data import completed.")
 
-# Função para escrever a lista de itens para reposição em um arquivo de texto
-def write_restock_list_to_file(items_to_restock):
+# Function to write the list of items to restock to S3
+def write_restock_list_to_s3(items_to_restock, timestamp):
     try:
-        with open(restock_list_file, 'w') as file:
-            file.write("Items to Restock:\n")
-            for item in items_to_restock:
-                file.write(f"ItemID: {item['ItemID']}, Warehouse: {item['WarehouseName']}, Current Stock Level: {item['CurrentStockLevel']}, Restock Threshold: {item['RestockThreshold']}\n")
-        print(f"List of items to restock saved to '{restock_list_file}'.")
+        # Extract the date (year, month, and day) from the timestamp
+        year = timestamp.year
+        month = timestamp.month
+        day = timestamp.day
+        
+        # Format the date in YYYY-MM-DD format
+        date_str = f"{year}-{month:02d}-{day:02d}"
+        
+        # File name
+        file_name = f"{restock_list_folder}/{date_str}.txt"
+        
+        # File content
+        file_content = f"Date {date_str}\nItems to Restock:\n"
+        for item in items_to_restock:
+            file_content += f"ItemID: {item['ItemID']}, ItemName: {item['ItemName']}, Warehouse: {item['WarehouseName']}, Current Stock Level: {item['CurrentStockLevel']}, Restock Threshold: {item['RestockThreshold']}\n"
+        
+        # Upload the file to S3
+        s3.put_object(Bucket=s3_bucket_name, Key=file_name, Body=file_content.encode('utf-8'))
+        
+        print(f"List of items to restock saved to S3 bucket '{s3_bucket_name}/{file_name}'.")
     except Exception as e:
-        print(f"Failed to save restock list: {e}")
+        print(f"Failed to save restock list to S3: {e}")
 
-# Executar a função de importação de dados
+# Execute the data import function
 import_inventory_data()
